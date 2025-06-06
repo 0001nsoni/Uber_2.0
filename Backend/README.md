@@ -11,40 +11,116 @@ POST
 ### Request Body
 The request body must be in JSON format and should include the following fields:
 
-- `username` (string, required): The desired username for the new account.
-- `email` (string, required): The email address of the user.
-- `password` (string, required): The password for the account. It should be at least 6 characters long.
+- `email` (string, required): The email address of the user. Must be a valid email.
+- `fullname` (object, required):
+  - `firstname` (string, required): First name, at least 3 characters long.
+  - `lastname` (string, optional): Last name.
+- `password` (string, required): The password for the account. Must be at least 5 characters long.
 
-### Example Request
+#### Example Request
+```json
 {
-  "username": "john_doe",
   "email": "john@example.com",
+  "fullname": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
   "password": "securepassword"
 }
+```
 
 ### Responses
 
 - **201 Created**: User successfully registered.
-  - Example response:
+  ```json
   {
-    "message": "User registered successfully."
+    "token": "<jwt_token>",
+    "user": { /* user object */ }
   }
+  ```
 
 - **400 Bad Request**: Validation error, missing or invalid fields.
-  - Example response:
+  ```json
   {
-    "error": "Invalid input data."
+    "errors": [
+      {
+        "msg": "First name must be at least 3 characters long",
+        "param": "fullname.firstname",
+        "location": "body"
+      }
+    ]
   }
+  ```
 
-- **409 Conflict**: Username or email already exists.
-  - Example response:
+- **500 Internal Server Error**: Server error.
+  ```json
   {
-    "error": "Username or email already in use."
+    "error": "Internal server error"
   }
+  ```
 
 ### Status Codes
 - 201: Created
 - 400: Bad Request
-- 409: Conflict
+- 500: Internal Server Error
 
-This documentation provides a clear overview of how to use the `/users/register` endpoint, including the required data and possible responses.
+---
+
+## Endpoint: `/users/login`
+
+### Description
+This endpoint allows users to log in with their email and password.
+
+### HTTP Method
+POST
+
+### Request Body
+The request body must be in JSON format and should include the following fields:
+
+- `email` (string, required): The email address of the user. Must be a valid email.
+- `password` (string, required): The password for the account. Must be at least 5 characters long.
+
+#### Example Request
+```json
+{
+  "email": "john@example.com",
+  "password": "securepassword"
+}
+```
+
+### Responses
+
+- **200 OK**: User successfully logged in.
+  ```json
+  {
+    "token": "<jwt_token>",
+    "user": { /* user object */ }
+  }
+  ```
+
+- **400 Bad Request**: Validation error, missing or invalid fields.
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Invalid Email",
+        "param": "email",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+- **401 Unauthorized**: Invalid email or password.
+  ```json
+  {
+    "message": "Invalid email or password"
+  }
+  ```
+
+### Status Codes
+- 200: OK
+- 400: Bad Request
+- 401: Unauthorized
+
+This documentation provides a clear overview of how to use the `/users/register` and `/users/login` endpoints, including the required data and possible responses.
