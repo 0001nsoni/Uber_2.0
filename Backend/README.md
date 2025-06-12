@@ -123,4 +123,82 @@ The request body must be in JSON format and should include the following fields:
 - 400: Bad Request
 - 401: Unauthorized
 
-This documentation provides a clear overview of how to use the `/users/register` and `/users/login` endpoints, including the required data and possible responses.
+---
+
+## Endpoint: `/users/profile`
+
+### Description
+Returns the profile of the currently authenticated user.  
+**Requires authentication.** You must provide a valid JWT token in a cookie named `token` or in the `Authorization` header as `Bearer <token>`.
+
+### HTTP Method
+GET
+
+### Request Headers
+- `Cookie: token=<jwt_token>`  
+  **or**
+- `Authorization: Bearer <jwt_token>`
+
+### Responses
+
+- **200 OK**: Returns the user profile.
+  ```json
+  {
+    "_id": "user_id",
+    "email": "john@example.com",
+    "fullname": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    // ...other user fields
+  }
+  ```
+
+- **401 Unauthorized**: Token missing, invalid, or user not found.
+  ```json
+  {
+    "message": "Unauthorized: Token not found"
+  }
+  ```
+
+### Status Codes
+- 200: OK
+- 401: Unauthorized
+
+---
+
+## Endpoint: `/users/logout`
+
+### Description
+Logs out the currently authenticated user by blacklisting the token and clearing the authentication cookie.  
+**Requires authentication.**
+
+### HTTP Method
+GET
+
+### Request Headers
+- `Cookie: token=<jwt_token>`  
+  **or**
+- `Authorization: Bearer <jwt_token>`
+
+### Responses
+
+- **200 OK**: Successfully logged out.
+  ```json
+  {
+    "message": "Logged out "
+  }
+  ```
+
+- **401 Unauthorized**: Token missing or invalid.
+  ```json
+  {
+    "message": "Unauthorized: Token not found"
+  }
+  ```
+
+### Status Codes
+- 200: OK
+- 401: Unauthorized
+
+---
