@@ -149,7 +149,7 @@ GET
     "fullname": {
       "firstname": "John",
       "lastname": "Doe"
-    },
+    }
     // ...other user fields
   }
   ```
@@ -200,5 +200,82 @@ GET
 ### Status Codes
 - 200: OK
 - 401: Unauthorized
+
+---
+
+## Endpoint: `/captains/register`
+
+### Description
+This endpoint allows captains (drivers) to register by providing their personal and vehicle details.
+
+### HTTP Method
+POST
+
+### Request Body
+The request body must be in JSON format and should include the following fields:
+
+- `email` (string, required): The email address of the captain. Must be a valid email.
+- `fullname` (object, required):
+  - `firstname` (string, required): First name, at least 3 characters long.
+  - `lastname` (string, optional): Last name.
+- `password` (string, required): The password for the account. Must be at least 3 characters long.
+- `vehicle` (object, required):
+  - `color` (string, required): Vehicle color, at least 3 characters long.
+  - `plate` (string, required): Vehicle plate, at least 3 characters long.
+  - `capacity` (integer, required): Vehicle capacity, at least 1.
+  - `vehicleType` (string, required): Type of vehicle. Must be one of: `"car"`, `"motorcycle"`, `"auto"`.
+
+#### Example Request
+```json
+{
+  "email": "captain@example.com",
+  "fullname": {
+    "firstname": "Alice",
+    "lastname": "Smith"
+  },
+  "password": "captain123",
+  "vehicle": {
+    "color": "Red",
+    "plate": "ABC123",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+### Responses
+
+- **201 Created**: Captain successfully registered.
+  ```json
+  {
+    "token": "<jwt_token>",
+    "captain": { /* captain object */ }
+  }
+  ```
+
+- **400 Bad Request**: Validation error, missing or invalid fields.
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "First name must be at least 3 char long",
+        "param": "fullname.firstname",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+- **500 Internal Server Error**: Server error.
+  ```json
+  {
+    "error": "Internal server error"
+  }
+  ```
+
+### Status Codes
+- 201: Created
+- 400: Bad Request
+- 500: Internal Server Error
 
 ---
