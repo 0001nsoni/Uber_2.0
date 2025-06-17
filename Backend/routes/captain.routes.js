@@ -1,7 +1,8 @@
 import express from 'express';
 import { Router } from 'express';
 import {body} from 'express-validator';
-import { registerCaptain } from '../controllers/captain.controller.js';
+import { registerCaptain,loginCaptain,getCaptainProfile, logoutCaptain } from '../controllers/captain.controller.js';
+import { authCaptain } from '../middlewares/auth.middleware.js';
 const router = express.Router();
 router.post('/register',[
     body('email').isEmail().withMessage('Invalid Email'),
@@ -14,7 +15,18 @@ router.post('/register',[
 
 ],
 registerCaptain
+);
+router.post('/login',[
+     body('email').isEmail().withMessage('Invalid Email'),
+    body('password').isLength({min:3}).withMessage('password must contain 3 char'),
+
+
+],
+loginCaptain
 )
+router.get('/profile',authCaptain,getCaptainProfile);
+router.get('/logout',authCaptain,logoutCaptain);
+
 
 
 export default router;
