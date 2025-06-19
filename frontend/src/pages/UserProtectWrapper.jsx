@@ -1,0 +1,25 @@
+import React,{useContext,useEffect} from 'react'
+import { UserDataContext } from '../context/UserContext'
+import { useNavigate } from 'react-router-dom'
+
+const UserProtectWrapper = ({children}) => {
+    const token = localStorage.getItem('token')
+    const {user}=useContext(UserDataContext);
+    const navigate=useNavigate();
+   
+   useEffect(() => {
+    if (!token) {
+      navigate('/login');
+    }
+  }, [token, navigate]);
+
+  // Optional: block rendering if no token to avoid flicker
+  if (!token) return null;
+  return (
+    <>
+    {children}
+    </>
+  )
+}
+
+export default UserProtectWrapper
