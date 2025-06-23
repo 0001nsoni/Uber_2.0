@@ -3,12 +3,15 @@ import { useGSAP } from '@gsap/react'
 import gsap from 'gsap';
 import 'remixicon/fonts/remixicon.css'
 import LocationSearchPanel from '../components/LocationSearchPanel';
+import VehiclePanel from '../components/VehiclePanel';
 const Home = () => {
   const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
   const [panelOpen, setPanelOpen] = useState(false);
+  const [vehiclePanel, setVehiclePanel] = useState(false)
   const panelRef = useRef(null);
   const panelCloseRef = useRef(null);
+  const vehiclePanelRef=useRef(null);
 
   const submitHandler = (e) => {
     e.preventDefalut();
@@ -19,30 +22,46 @@ const Home = () => {
       gsap.to(panelRef.current,
         {
           height: '70%',
-          padding:'24'
+          padding: '24'
         })
-        gsap.to(panelCloseRef.current,{opacity:1})
+      gsap.to(panelCloseRef.current, { opacity: 1 })
 
     }
-    else{
-      gsap.to(panelRef.current,{
-        height:'0%',
-          padding:'0'
+    else {
+      gsap.to(panelRef.current, {
+        height: '0%',
+        padding: '0'
 
       })
-        gsap.to(panelCloseRef.current,{opacity:0})
+      gsap.to(panelCloseRef.current, { opacity: 0 })
     }
 
-  },[panelOpen])
+  }, [panelOpen])
+  useGSAP(function()
+{
+ if(vehiclePanel)
+ {
+   gsap.to(vehiclePanelRef.current,{
+    transform:'translateY(0)'
+  })
+ }
+ else{
+   gsap.to(vehiclePanelRef.current,{
+    transform:'translateY(100%)'
+  })
+ }
+
+
+},[vehiclePanel])
   return (
-    <div className='relative h-screen'>
+    <div className='relative h-screen overflow-hidden'>
       <img className='w-16 absolute left-5 top-5 ' src=" https://upload.wikimedia.org/wikipedia/commons/c/cc/Uber_logo_2018.png" alt="" />
       <div className='h-screen w-screen'>
         <img className='h-full w-full object-cover' src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif" alt="" />
       </div>
       <div className=' h-screen flex flex-col justify-end absolute top-0 w-full '>
         <div className='h-[30%] bg-white p-6 relative'>
-          <h5 ref={panelCloseRef} onClick={()=>{setPanelOpen(false)}} className=' opacity-0 absolute top-10 right-5 text-2xl font-bold'>
+          <h5 ref={panelCloseRef} onClick={() => { setPanelOpen(false) }} className=' opacity-0 absolute top-10 right-5 text-2xl font-bold'>
             <i className='ri-arrow-down-wide-line'></i>
           </h5>
           <h4 className='text-3xl p-3 font-semibold '>Find a Trip</h4>
@@ -53,9 +72,15 @@ const Home = () => {
 
           </form></div>
         <div ref={panelRef} className=' bg-white h-[0]'>
-          <LocationSearchPanel/>
+          <LocationSearchPanel  setVehiclePanel={setVehiclePanel}setPanelOpen={setPanelOpen} />
         </div>
       </div>
+      <div ref={vehiclePanelRef} className='p-3 flex flex-col items-center justify-center  fixed w-full z-10 bottom-0  bg-white'>
+       
+       <VehiclePanel setVehiclePanel={setVehiclePanel}/>
+
+      </div>
+
     </div>
   )
 }
