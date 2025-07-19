@@ -1,17 +1,16 @@
-import React ,{useState}from 'react';
+import React from 'react';
 import {Link} from 'react-router-dom';
 
-const ConfirmRidePopUp = (props) => {
-    const [otp, setOtp] = useState()
-    const submitHandler=(e)=>{
-        e.preventDefault();
-    }
-    return (
-        <div className='h-screen p-2'>
+const FinishRide = (props) => {
+  return (
+            <div className=' p-2'>
+<h5 className=" w-full text-center text-gray-700 text-2xl cursor-pointer">
+                <i onClick={()=>{props.setFinishRidePanel(false)}}  className="ri-arrow-down-wide-line"></i>
+            </h5>
 
 
 
-            <h3 className="text-3xl w-full text-center font-bold mb-5 mt-5 ">Confirm this ride to start</h3>
+            <h3 className="text-3xl w-full text-center font-bold mb-5 mt-5 ">Finish this ride </h3>
             <div className='flex items-center justify-between gap-2 mb-3 bg-gray-50 rounded-lg'>
                 <div className='flex items-center justify-between gap-2 '>
                     <img className='h-12 w-12 rounded-full object-cover ' src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="" />
@@ -58,20 +57,12 @@ const ConfirmRidePopUp = (props) => {
                         <h5 className="font-semibold">Cash</h5>
                     </div>
                 </div>
-                <div className='w-full' >
-                <form onSubmit={(e)=>{
-
-                }} className='mt-6 flex flex-col gap-x-2 justify-center w-full items-center gap-2' action="">
-                    <input value={otp} onChange={(e)=>setOtp(e.target.value)} className='bg-[#eee] px-6 py-4 font-mono text-lg rounded-lg w-full mt-3 ' type="text" placeholder='Enter OTP' />
-
-                <Link to={'/captain-riding'} onClick={() => {  }} className="w-full text-center bg-green-600 text-white font-bold py-2 rounded-lg">Confirm</Link>
-                <button onClick={() => { props.setRidePopupPanel(false);props.setConfirmRidePopupPanel(false) }} className="w-full bg-red-500 text-white font-bold py-2 rounded-lg">Cancel</button>
-                </form>
-                </div>
+                <Link to={'/captain-home'} onClick={() => {  }} className="w-full text-center bg-green-600 text-white font-bold py-2 rounded-lg">Finish Ride</Link>
+                <p className=' mt-10 text-xs'>Click on finish ride button if you have completed the payment</p>
 
             </div>
         </div>
-    )
+  )
 }
 
-export default ConfirmRidePopUp
+export default FinishRide
