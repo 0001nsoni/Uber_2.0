@@ -23,7 +23,7 @@ async function getFare(pickup, destination) {
   const rates = {
     auto: { baseFare: 30, perKmRate: 10, perMinRate: 1.5, minFare: 50 },
     car: { baseFare: 50, perKmRate: 12, perMinRate: 2, minFare: 80 },
-    motorcycle: { baseFare: 20, perKmRate: 8, perMinRate: 1, minFare: 40 },
+    moto: { baseFare: 20, perKmRate: 8, perMinRate: 1, minFare: 40 },
   };
 
   const calculateFare = (rate) => {
@@ -38,7 +38,7 @@ async function getFare(pickup, destination) {
   return {
     auto: calculateFare(rates.auto),
     car: calculateFare(rates.car),
-    motorcycle: calculateFare(rates.motorcycle),
+    moto: calculateFare(rates.moto),
   };
 }
 export const createRide = async({user,pickup,destination,vehicleType})=>{
