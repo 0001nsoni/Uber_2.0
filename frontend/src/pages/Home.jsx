@@ -2,11 +2,13 @@ import React, { useState, useRef } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap';
 import 'remixicon/fonts/remixicon.css'
+import axios from 'axios';
 import LocationSearchPanel from '../components/LocationSearchPanel';
 import VehiclePanel from '../components/VehiclePanel';
 import ConfirmRide from '../components/ConfirmRide';
 import LookingForDriver from '../components/LookingForDriver';
 import WaitingForDriver from '../components/WaitingForDriver';
+
 const Home = () => {
   const [pickup, setPickup] = useState('');
   const [destination, setDestination] = useState('');
@@ -16,15 +18,61 @@ const Home = () => {
   const [vehicleFound, setVehicleFound] = useState(false);
   const [waitingForDriver, setWaitingForDriver] = useState(false);
 
+  const [suggestions, setSuggestions] = useState([]);
+  const [activeField, setActiveField] = useState(null); // 'pickup' or 'destination'
+
   const panelRef = useRef(null);
   const panelCloseRef = useRef(null);
   const vehiclePanelRef = useRef(null);
   const confirmRidePanelRef = useRef(null);
   const vehicleFoundRef = useRef(null);
   const waitingForDriverRef = useRef(null);
-  const submitHandler = (e) => {
-    e.preventDefault();
-  }
+
+  // Debounce timer
+  const debounceTimer = useRef(null);
+
+  // Fetch suggestions from backend
+  const fetchSuggestions = (input) => {
+    if (!input || input.length < 3) {
+      setSuggestions([]);
+      return;
+    }
+    axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
+      params: { input },
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    })
+      .then(res => {
+        setSuggestions(res.data.predictions || res.data);
+      })
+      .catch(() => setSuggestions([]));
+  };
+
+  // Handle input change for pickup/destination
+  const handleInputChange = (e, field) => {
+    const value = e.target.value;
+    if (field === 'pickup') setPickup(value);
+    else setDestination(value);
+
+    setActiveField(field);
+    setPanelOpen(true);
+
+    // Debounce API call
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      fetchSuggestions(value);
+    }, 300);
+  };
+
+  // Handle suggestion click
+  const handleSuggestionClick = (suggestion) => {
+    if (activeField === 'pickup') setPickup(suggestion.description || suggestion);
+    else setDestination(suggestion.description || suggestion);
+    // setPanelOpen(false);
+    setSuggestions([]);
+  };
+
   useGSAP(function () {
     if (panelOpen) {
 
@@ -83,7 +131,7 @@ const Home = () => {
       });
     }
   }, [vehicleFound]);
- useGSAP(function () {
+  useGSAP(function () {
     if (waitingForDriver) {
       gsap.to(waitingForDriverRef.current, {
         transform: 'translateY(0%)'
@@ -94,7 +142,10 @@ const Home = () => {
       });
     }
   }, [waitingForDriver]);
-
+function findTrip(){
+  setVehiclePanel(true);
+  setPanelOpen(false);
+}
 
   return (
     <div className='relative h-screen overflow-hidden'>
@@ -109,13 +160,42 @@ const Home = () => {
           </h5>
           <h4 className='text-3xl p-3 font-semibold '>Find a Trip</h4>
           <form action="">
-            {/* <div className="line left-[8%] rounded-full absolute h-15 w-1 bg-gray-900 top-[51%]"></div> */}
-            <input onClick={() => { setPanelOpen(true) }} value={pickup} onChange={(e) => { setPickup(e.target.value) }} className='bg-[#eeee] px-8 py-2 text-base rounded-lg w-full mt-3 ' type="text" placeholder='Add a pick-up loacation' />
-            <input onClick={() => { setPanelOpen(true) }} value={destination} onChange={(e) => { setDestination(e.target.value) }} className='bg-[#eeee] px-8 py-2 text-base rounded-lg w-full mt-3 ' type="text" placeholder='Enter your destination' />
-
-          </form></div>
-        <div ref={panelRef} className=' bg-white h-[0]'>
-          <LocationSearchPanel setVehiclePanel={setVehiclePanel} setPanelOpen={setPanelOpen} />
+            <input
+              onClick={() => { setPanelOpen(true); setActiveField('pickup'); }}
+              value={pickup}
+              onChange={(e) => handleInputChange(e, 'pickup')}
+              className='bg-[#eeee] px-8 py-2 text-base rounded-lg w-full mt-3 '
+              type="text"
+              placeholder='Add a pick-up location'
+              autoComplete="off"
+            />
+            <input
+              onClick={() => { setPanelOpen(true); setActiveField('destination'); }}
+              value={destination}
+              onChange={(e) => handleInputChange(e, 'destination')}
+              className='bg-[#eeee] px-8 py-2 text-base rounded-lg w-full mt-3 '
+              type="text"
+              placeholder='Enter your destination'
+              autoComplete="off"
+            />
+          </form>
+          <button
+            className="w-full bg-black text-white py-2 rounded-lg mt-4 font-semibold text-lg hover:bg-gray-900 transition"
+          onClick={()=>{
+            findTrip();
+          }}
+          >
+            Find Trip
+          </button>
+        </div>
+        <div ref={panelRef} className=' bg-white h-[0] '>
+          <LocationSearchPanel
+            suggestions={suggestions}
+            onSuggestionClick={handleSuggestionClick}
+            setVehiclePanel={setVehiclePanel}
+            setPanelOpen={setPanelOpen}
+            panelOpen={panelOpen}
+          />
         </div>
       </div>
       <div ref={vehiclePanelRef} className='p-3 flex flex-col items-center justify-center  fixed w-full z-10 bottom-0  bg-white'>

@@ -424,3 +424,233 @@ GET
 - 401: Unauthorized
 
 ---
+
+## Endpoint: `/rides/create`
+
+### Description
+Creates a new ride request for an authenticated user.
+
+### HTTP Method
+POST
+
+### Authentication
+Requires a valid JWT token in a cookie named `token` or in the `Authorization` header as `Bearer <token>`.
+
+### Request Body
+The request body must be in JSON format and should include:
+
+- `pickup` (string, required): The pickup address. Must be at least 3 characters long.
+- `destination` (string, required): The destination address. Must be at least 3 characters long.
+- `vehicleType` (string, required): The type of vehicle. Must be one of: `"auto"`, `"car"`, `"moto"`.
+
+#### Example Request
+```json
+{
+  "pickup": "Arya college kukas",
+  "destination": "Wtp jaipur",
+  "vehicleType": "car"
+}
+```
+
+### Responses
+
+- **201 Created**: Ride successfully created.
+  ```json
+  {
+    "success": true,
+    "message": "Ride created successfully",
+    "ride": {
+      "_id": "ride_id",
+      "user": "user_id",
+      "pickup": "Arya college kukas",
+      "destination": "Wtp jaipur",
+      "fare": 123.45,
+      "status": "pending",
+      "otp": "123456",
+      // ...other ride fields
+    }
+  }
+  ```
+
+- **400 Bad Request**: Validation error, missing or invalid fields, or unable to calculate fare.
+  ```json
+  {
+    "success": false,
+    "message": "Could not calculate distance or duration. Please check your addresses."
+  }
+  ```
+
+- **401 Unauthorized**: Token missing or invalid.
+  ```json
+  {
+    "message": "Unauthorized: Token not found"
+  }
+  ```
+
+### Status Codes
+- 201: Created
+- 400: Bad Request
+- 401: Unauthorized
+
+---
+
+## Endpoint: `/maps/get-coordinates`
+
+### Description
+Returns the latitude and longitude for a given address.  
+**Requires authentication.**
+
+### HTTP Method
+GET
+
+### Query Parameters
+- `address` (string, required): The address to geocode. Must be at least 3 characters long.
+
+#### Example Request
+```
+GET /maps/get-coordinates?address=World Trade Park Jaipur
+```
+
+### Responses
+
+- **200 OK**: Returns the coordinates.
+  ```json
+  {
+    "lat": 26.8506,
+    "lng": 75.8007
+  }
+  ```
+
+- **400 Bad Request**: Validation error or missing/invalid address.
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Address must be at least 3 characters long",
+        "param": "address",
+        "location": "query"
+      }
+    ]
+  }
+  ```
+
+- **401 Unauthorized**: Token missing or invalid.
+  ```json
+  {
+    "message": "Unauthorized: Token not found"
+  }
+  ```
+
+### Status Codes
+- 200: OK
+- 400: Bad Request
+- 401: Unauthorized
+
+---
+
+## Endpoint: `/maps/get-distance-time`
+
+### Description
+Returns the distance (in kilometers) and duration (in minutes) between two addresses.  
+**Requires authentication.**
+
+### HTTP Method
+GET
+
+### Query Parameters
+- `origin` (string, required): The starting address. Must be at least 3 characters long.
+- `destination` (string, required): The destination address. Must be at least 3 characters long.
+
+#### Example Request
+```
+GET /maps/get-distance-time?origin=Arya college kukas&destination=Wtp jaipur
+```
+
+### Responses
+
+- **200 OK**: Returns the distance and duration.
+  ```json
+  {
+    "distanceInKm": 15.2,
+    "durationInMin": 32.5
+  }
+  ```
+
+- **400 Bad Request**: Validation error or missing/invalid addresses.
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Invalid value",
+        "param": "origin",
+        "location": "query"
+      }
+    ]
+  }
+  ```
+
+- **401 Unauthorized**: Token missing or invalid.
+  ```json
+  {
+    "message": "Unauthorized: Token not found"
+  }
+  ```
+
+### Status Codes
+- 200: OK
+- 400: Bad Request
+- 401: Unauthorized
+
+---
+
+## Endpoint: `/maps/get-suggestions`
+
+### Description
+Returns autocomplete suggestions for a partial address input using Google Places API.  
+**Requires authentication.**
+
+### HTTP Method
+GET
+
+### Query Parameters
+- `input` (string, required): The partial address input. Must be at least 3 characters long.
+
+#### Example Request
+```
+GET /maps/get-suggestions?input=World Trade
+```
+
+### Responses
+
+- **200 OK**: Returns an array of address predictions.
+  ```json
+  [
+    {
+      "description": "World Trade Park, Jaipur, Rajasthan, India",
+      "place_id": "ChIJw2nZQwQXbDkR0lQyQ0Q0Q0Q"
+      // ...other fields
+    }
+    // ...more predictions
+  ]
+  ```
+
+- **400 Bad Request**: Validation error or missing/invalid input.
+  ```json
+  {
+    "message": "Query parameter 'input' is required"
+  }
+  ```
+
+- **401 Unauthorized**: Token missing or invalid.
+  ```json
+  {
+    "message": "Unauthorized: Token not found"
+  }
+  ```
+
+### Status Codes
+- 200: OK
+- 400: Bad Request
+- 401: Unauthorized
+
+---

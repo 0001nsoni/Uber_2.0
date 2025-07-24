@@ -31,7 +31,7 @@ export const getDistanceTime = async (origin, destination) => {
 
   try {
     const response = await axios.get(url);
-    console.log("Google Distance Matrix API response:", response.data);
+   
 
     if (response.data.status === 'OK') {
       const element = response.data.rows[0].elements[0];
