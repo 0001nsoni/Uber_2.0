@@ -31,6 +31,7 @@ export const getDistanceTime = async (origin, destination) => {
 
   try {
     const response = await axios.get(url);
+    console.log("Google Distance Matrix API response:", response.data);
 
     if (response.data.status === 'OK') {
       const element = response.data.rows[0].elements[0];
@@ -39,8 +40,11 @@ export const getDistanceTime = async (origin, destination) => {
         throw new Error('No routes found');
       }
 
-      return element; 
-     
+      // Parse and return in the expected format
+      return {
+        distanceInKm: element.distance.value / 1000, // meters to km
+        durationInMin: element.duration.value / 60    // seconds to min
+      };
     } else {
       throw new Error(`Unable to fetch distance and time: ${response.data.status}`);
     }
