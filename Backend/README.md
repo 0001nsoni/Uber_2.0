@@ -654,3 +654,67 @@ GET /maps/get-suggestions?input=World Trade
 - 401: Unauthorized
 
 ---
+
+## Endpoint: `/rides/get-fare`
+
+### Description
+Returns the estimated fare for each vehicle type between two locations.  
+**Requires authentication.**
+
+### HTTP Method
+GET
+
+### Query Parameters
+- `pickup` (string, required): The pickup address. Must be at least 3 characters long.
+- `destination` (string, required): The destination address. Must be at least 3 characters long.
+
+#### Example Request
+```
+GET /rides/get-fare?pickup=Arya%20college%20kukas&destination=Wtp%20jaipur
+```
+
+### Responses
+
+- **200 OK**: Returns the estimated fare for each vehicle type.
+  ```json
+  {
+    "auto": 120,
+    "car": 180,
+    "moto": 90
+  }
+  ```
+
+- **400 Bad Request**: Validation error or missing/invalid addresses.
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Invalid pickup location",
+        "param": "pickup",
+        "location": "query"
+      }
+    ]
+  }
+  ```
+
+- **401 Unauthorized**: Token missing or invalid.
+  ```json
+  {
+    "message": "Unauthorized: Token not found"
+  }
+  ```
+
+- **500 Internal Server Error**: Server error.
+  ```json
+  {
+    "message": "Could not calculate distance or duration. Please check your addresses."
+  }
+  ```
+
+### Status Codes
+- 200: OK
+- 400: Bad Request
+- 401: Unauthorized
+- 500: Internal Server Error
+
+---

@@ -1,11 +1,12 @@
-import React, { useState, useRef } from 'react';
-
+import React, { useState, useRef, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom'
 import CaptainDetails from '../components/CaptainDetails'
 import RidePopUp from '../components/RidePopUp'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap';
 import ConfirmRidePopUp from '../components/ConfirmRidePopUp';
+import { SocketContext } from '../context/SocketContext';
+import { CaptainDataContext } from '../context/CaptainContext';
 
 const CaptainHome = () => {
   const [ridePopupPanel, setRidePopupPanel] = useState(true);
@@ -13,6 +14,36 @@ const CaptainHome = () => {
 
   const ridePopupPanelRef = useRef(null)
   const confirmRidePanelRef = useRef(null);
+
+  // --- SOCKET.IO LOGIC ---
+  const { captain } = useContext(CaptainDataContext);
+  const { sendMessage } = useContext(SocketContext);
+
+  useEffect(() => {
+    let locationInterval;
+    if (captain && captain._id) {
+      sendMessage("join", { userType: "captain", userId: captain._id });
+
+      // Send location every 10 seconds
+      locationInterval = setInterval(() => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(position => {
+            sendMessage('update-location-captain', {
+              userId: captain._id,
+              userType: "captain",
+              location: {
+                ltd: position.coords.latitude,
+                lng: position.coords.longitude
+              }
+            });
+          });
+        }
+      }, 10000);
+    }
+    return () => clearInterval(locationInterval);
+  }, [captain, sendMessage]);
+  // --- END SOCKET.IO LOGIC ---
+
   useGSAP(function () {
     if (ridePopupPanel) {
       gsap.to(ridePopupPanelRef.current, {

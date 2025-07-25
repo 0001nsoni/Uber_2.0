@@ -1,61 +1,68 @@
 import React from 'react';
 
-const ConfirmRide = (props) => {
-    return (
-        <div className="w-full px-3 pt-10 pb-5  flex flex-col items-center">
+const ConfirmRide = ({
+  pickup = '',
+  destination = '',
+  vehicleType = '',
+  fare = {},
+  createRide,
+  setConfirmRidePanel,
+  setVehicleFound
+}) => {
+  return (
+    <div className="w-full px-3 pt-10 pb-5 flex flex-col items-center">
+      <h5 className="w-full text-center text-gray-700 text-2xl cursor-pointer">
+        <i onClick={() => setConfirmRidePanel(false)} className="ri-arrow-down-wide-line"></i>
+      </h5>
 
-            <h5 className=" w-full text-center text-gray-700 text-2xl cursor-pointer">
-                <i onClick={() => { props.setConfirmRidePanel(false) }} className="ri-arrow-down-wide-line"></i>
-            </h5>
+      <h3 className="text-2xl w-full text-center font-semibold mb-5">Confirm your Ride</h3>
 
+      <div className="flex flex-col gap-4 gap-y-6 justify-between items-center w-full">
+        <img className="h-20 object-contain" src="https://www.pngplay.com/wp-content/uploads/8/Uber-PNG-Photos.png" alt="" />
 
-            <h3 className="text-2xl w-full text-center font-semibold mb-5">Confirm your Ride</h3>
-
-
-            <div className="flex flex-col gap-4 gap-y-6 justify-between items-center w-full">
-
-                <img className="h-20 object-contain" src="https://www.pngplay.com/wp-content/uploads/8/Uber-PNG-Photos.png" alt="" />
-
-
-                <div className="w-full flex items-start gap-3">
-                    <div className="bg-gray-300 h-10 w-10 flex items-center justify-center rounded-full flex-shrink-0">
-                        <i className="ri-map-pin-range-fill"></i>
-                    </div>
-                    <div className="flex flex-col">
-                        <h5 className="text-xl font-bold">562/11-A</h5>
-                        <h5 className="font-semibold">Kaikondrahalli, Bengaluru, Karnataka</h5>
-                    </div>
-                </div>
-
-                
-                <div className="w-full flex items-start gap-3">
-                    <div className="bg-gray-300 h-10 w-10 flex items-center justify-center rounded-full flex-shrink-0">
-                        <i className="ri-square-fill"></i>
-                    </div>
-                    <div className="flex flex-col w-full">
-                        <h5 className="text-xl font-bold">Third Wave Cafe</h5>
-                        <h5 className="font-semibold break-words whitespace-normal leading-snug text-sm text-gray-700">
-                            17th Cross Rd, PWD Quarters, 1st Sector, HSR Layout, Bengaluru, Karnataka
-                        </h5>
-                    </div>
-                </div>
-
-               
-                <div className="w-full flex items-start gap-3">
-                    <div className="bg-gray-300 h-10 w-10 flex items-center justify-center rounded-full flex-shrink-0">
-                        <i className="ri-bank-card-2-fill"></i>
-                    </div>
-                    <div className="flex flex-col">
-                        <h5 className="text-xl font-bold">₹193.20</h5>
-                        <h5 className="font-semibold">Cash</h5>
-                    </div>
-                </div>
-
-
-                <button onClick={()=>{props.setVehicleFound(true),props.setConfirmRidePanel(false)}} className="w-full bg-green-600 text-white font-bold py-2 rounded-lg">Confirm</button>
-            </div>
+        <div className="w-full flex items-start gap-3">
+          <div className="bg-gray-300 h-10 w-10 flex items-center justify-center rounded-full flex-shrink-0">
+            <i className="ri-map-pin-range-fill"></i>
+          </div>
+          <div className="flex flex-col">
+            <h5 className="text-base font-bold text-gray-500">Pickup</h5>
+            <h5 className="font-bold text-base break-words whitespace-normal leading-snug text-gray-900">{pickup}</h5>
+          </div>
         </div>
-    );
+
+        <div className="w-full flex items-start gap-3">
+          <div className="bg-gray-300 h-10 w-10 flex items-center justify-center rounded-full flex-shrink-0">
+            <i className="ri-square-fill"></i>
+          </div>
+          <div className="flex flex-col w-full">
+            <h5 className="text-base font-bold text-gray-500">Destination</h5>
+            <h5 className="font-bold text-base break-words whitespace-normal leading-snug text-gray-900">{destination}</h5>
+          </div>
+        </div>
+
+        <div className="w-full flex items-start gap-3">
+          <div className="bg-gray-300 h-10 w-10 flex items-center justify-center rounded-full flex-shrink-0">
+            <i className="ri-bank-card-2-fill"></i>
+          </div>
+          <div className="flex flex-col">
+            <h5 className="text-xl font-bold">₹{fare[vehicleType] ?? '--'}</h5>
+            <h5 className="font-semibold">Cash</h5>
+          </div>
+        </div>
+
+        <button
+          onClick={() => {
+            createRide();
+            setVehicleFound(true);
+            setConfirmRidePanel(false);
+          }}
+          className="w-full bg-green-600 text-white font-bold py-2 rounded-lg"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  );
 };
 
 export default ConfirmRide;

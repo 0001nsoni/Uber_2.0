@@ -43,6 +43,7 @@ async function getFare(pickup, destination) {
     moto: calculateFare(rates.moto),
   };
 }
+export {getFare};
 function getOtp(num)
 {
   const otp=crypto.randomInt(Math.pow(10,num-1),Math.pow(10,num)).toString();

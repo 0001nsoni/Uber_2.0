@@ -1,4 +1,5 @@
-import { createRide } from "../services/ride.service.js";
+import { getAddressCoordinate, getCaptainsInTheRadius } from "../services/maps.service.js";
+import { createRide, getFare } from "../services/ride.service.js";
 import { validationResult } from "express-validator";
 
 export const createRides = async (req, res) => {
@@ -17,11 +18,28 @@ export const createRides = async (req, res) => {
       vehicleType,
     });
 
-    return res.status(201).json({
+    // ✅ Send response immediately
+    res.status(201).json({
       success: true,
       message: "Ride created successfully",
       ride,
     });
+
+    // ✅ Do async work without affecting response
+    (async () => {
+      try {
+        const pickupCoordinates = await getAddressCoordinate(pickup);
+        const captainsInRadius = await getCaptainsInTheRadius(
+          pickupCoordinates.lat, // FIX typo
+          pickupCoordinates.lng,
+          2
+        );
+        console.log("captainsInRadius:", captainsInRadius);
+      } catch (bgErr) {
+        console.error("Background task error:", bgErr.message);
+      }
+    })();
+
   } catch (err) {
     return res.status(400).json({
       success: false,
@@ -29,3 +47,19 @@ export const createRides = async (req, res) => {
     });
   }
 };
+
+export const getFaree = async(req,res)=>{
+  const errors = validationResult(req);
+  if(!errors.isEmpty()){
+    return res.status(400).json({errors:errors.array()});
+  }
+  const {pickup,destination}=req.query;
+  try{
+    const fare=await getFare(pickup,destination);
+    return res.status(200).json(fare);
+  }
+  catch(err)
+  {
+    return res.status(500).json({message:err.message});
+  }
+}
